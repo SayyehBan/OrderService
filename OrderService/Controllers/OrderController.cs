@@ -27,11 +27,4 @@ public class OrderController : ControllerBase
         var order = orderService.GetOrderById(OrderId);
         return Ok(order);
     }
-
-    [HttpPost]
-    public IActionResult Post([FromBody] AddOrderDto order)
-    {
-        orderService.AddOrder(order);
-        return Ok();
-    }
 }
