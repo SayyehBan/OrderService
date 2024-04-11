@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using OrderService.Model.Services.RegisterOrderServices;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
@@ -15,8 +16,9 @@ public class RecievedOrderCreatedMessage : BackgroundService
     private readonly string _queueName;
     private readonly string _username;
     private readonly string _password;
+    private readonly IRegisterOrderService registerOrderService;
 
-    public RecievedOrderCreatedMessage(IOptions<RabbitMqConfiguration> rabbitMqOptions)
+    public RecievedOrderCreatedMessage(IOptions<RabbitMqConfiguration> rabbitMqOptions, IRegisterOrderService registerOrderService)
     {
         _hostname = rabbitMqOptions.Value.Hostname;
         _queueName = rabbitMqOptions.Value.QueueName_BasketCheckout;
@@ -34,7 +36,7 @@ public class RecievedOrderCreatedMessage : BackgroundService
         _channel = _connection.CreateModel();
         _channel.QueueDeclare(queue: _queueName, durable: true,
             exclusive: false, autoDelete: false, arguments: null);
-
+        this.registerOrderService = registerOrderService;
     }
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -61,7 +63,7 @@ public class RecievedOrderCreatedMessage : BackgroundService
 
     private bool HandleMessage(BasketDto basket)
     {
-        return false;
+       return registerOrderService.Execute(basket);
     }
 }
 
@@ -69,7 +71,7 @@ public class RecievedOrderCreatedMessage : BackgroundService
 public class BasketItem
 {
     public string BasketItemId { get; set; }
-    public string ProductId { get; set; }
+    public Guid ProductId { get; set; }
     public string Name { get; set; }
     public int Price { get; set; }
     public int Quantity { get; set; }
