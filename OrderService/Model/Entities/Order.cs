@@ -13,7 +13,7 @@ public class Order
     public int TotalPrice { get; set; }
 
     public ICollection<OrderLine> OrderLines { get; private set; }
-
+    public PaymentStatus PaymentStatus { get; private set; }
     public Order(string UserId,
         string FirstName,
         string LastName,
@@ -24,13 +24,41 @@ public class Order
     {
         this.UserId = UserId;
         this.OrderPaid = false;
-        this.OrderPlaced = DateTime.Now;
+        this.OrderPlaced = DateTime.UtcNow;
         this.OrderLines = OrderLines;
         this.FirstName = FirstName;
         this.LastName = LastName;
         this.Address = Address;
         this.PhoneNumber = PhoneNumber;
         this.TotalPrice = TotalPrice;
+        this.PaymentStatus = PaymentStatus.unPaid;
     }
     public Order() { }
+    public void RequestPayment()
+    {
+        PaymentStatus = PaymentStatus.RequestPayment;
+    }
+
+    public void PaymentIsDone()
+    {
+        OrderPaid = true;
+        PaymentStatus = PaymentStatus.isPaid;
+    }
+}
+public enum PaymentStatus
+{
+    /// <summary>
+    /// پرداخت نشده
+    /// </summary>
+    unPaid = 0,
+
+    /// <summary>
+    /// درخواست پرداخت ثبت شده
+    /// </summary>
+    RequestPayment = 1,
+
+    /// <summary>
+    /// پرداخت شده است
+    /// </summary>
+    isPaid = 2,
 }
