@@ -19,7 +19,8 @@ builder.Services.AddTransient<IOrderService, ROrderService>();
 
 
 var configureServices = new ConfigureServicesRabbitMQ();
-configureServices.ConfigureService(builder.Services);//RabbitMQ
+configureServices.ConfigureService(builder.Services);
+//RabbitMQ
 builder.Services.Configure<RabbitMqConnectionSettings>(builder.Configuration
     .GetSection("RabbitMq"));
 //builder.Services.Configure<RabbitMqConfiguration>(builder.Configuration.GetSection("RabbitMq"));
