@@ -6,6 +6,7 @@ using OrderService.Model.Services.ProductServices;
 using OrderService.Model.Services.RegisterOrderServices;
 using SayyehBanTools.ConfigureService;
 using SayyehBanTools.MessagingBus.RabbitMQ.Model;
+using OrderService.MessagingBus.RecievedMessages;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,9 +24,9 @@ configureServices.ConfigureService(builder.Services);
 //RabbitMQ
 builder.Services.Configure<RabbitMqConnectionSettings>(builder.Configuration
     .GetSection("RabbitMq"));
-//builder.Services.Configure<RabbitMqConfiguration>(builder.Configuration.GetSection("RabbitMq"));
 
-//builder.Services.AddHostedService<RecievedOrderCreatedMessage>();
+builder.Services.AddHostedService<RecievedOrderCreatedMessage>();
+builder.Services.AddHostedService<RecievedPaymentOfOrderService>();
 builder.Services.AddTransient<IProductService, RProductService>();
 builder.Services.AddTransient<IRegisterOrderService, RRegisterOrderService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
