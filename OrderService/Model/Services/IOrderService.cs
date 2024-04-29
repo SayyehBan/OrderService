@@ -103,7 +103,7 @@ public class ROrderService : IOrderService
             MessageId = Guid.NewGuid(),
             OrderId = order.Id,
         };
-        sendMessages.SendMessage(paymentMessage, _queueName);
+        sendMessages.SendMessage(paymentMessage,null, _queueName);
         //تغییر وضعیت پرداخت سفارش
         order.RequestPayment();
         context.SaveChanges();
