@@ -1,28 +1,24 @@
-﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using OrderService.Model.Links;
 using OrderService.Model.Services.RegisterOrderServices;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using SayyehBanTools.MessagingBus.RabbitMQ.Connection;
-using SayyehBanTools.MessagingBus.RabbitMQ.Model;
 using System.Text;
 
 namespace OrderService.MessagingBus.RecievedMessages;
 
 public class RecievedOrderCreatedMessage : BackgroundService
 {
-    private readonly RabbitMqConnectionSettings _rabbitMqConnectionSettings;
     private readonly RabbitMQConnection rabbitMQConnection;
     private readonly IRegisterOrderService registerOrderService;
-    private readonly string _queueName;
-    public RecievedOrderCreatedMessage(RabbitMQConnection rabbitMQConnection, IRegisterOrderService registerOrderService, IOptions<RabbitMqConnectionSettings> rabbitMqConnectionSettings)
+   
+    public RecievedOrderCreatedMessage(RabbitMQConnection rabbitMQConnection, IRegisterOrderService registerOrderService)
     {
-        _rabbitMqConnectionSettings = rabbitMqConnectionSettings.Value;
-        _queueName = _rabbitMqConnectionSettings.queue;
         this.rabbitMQConnection = rabbitMQConnection;
         this.rabbitMQConnection.CreateRabbitMQConnection();
         this.rabbitMQConnection.Channel = rabbitMQConnection.Connection.CreateModel();
-        this.rabbitMQConnection.Channel.QueueDeclare(queue: _queueName, durable: true,
+        this.rabbitMQConnection.Channel.QueueDeclare(queue: LinkRabbitMQ.BasketCheckout, durable: true,
             exclusive: false, autoDelete: false, arguments: null);
         this.registerOrderService = registerOrderService;
     }
@@ -42,7 +38,7 @@ public class RecievedOrderCreatedMessage : BackgroundService
             if (resultHandle)
                 rabbitMQConnection.Channel.BasicAck(eventArg.DeliveryTag, false);
         };
-        rabbitMQConnection.Channel.BasicConsume(queue: _queueName, false, consumer);
+        rabbitMQConnection.Channel.BasicConsume(queue: LinkRabbitMQ.BasketCheckout, false, consumer);
 
 
         return Task.CompletedTask;

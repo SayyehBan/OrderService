@@ -1,11 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using OrderService.Infrastructure.Context;
-using OrderService.MessagingBus;
 using OrderService.MessagingBus.Messages;
 using OrderService.Model.Dto;
 using OrderService.Model.Entities;
-using SayyehBanTools.MessagingBus.RabbitMQ.Model;
+using OrderService.Model.Links;
 using SayyehBanTools.MessagingBus.RabbitMQ.SendMessage;
 
 namespace OrderService.Model.Services;
@@ -22,14 +20,11 @@ public class ROrderService : IOrderService
 {
     private readonly OrderDataBaseContext context;
     private readonly ISendMessages sendMessages;
-    private readonly RabbitMqConnectionSettings _rabbitMqConnectionSettings;
-    private readonly string _queueName;
-    public ROrderService(OrderDataBaseContext context,ISendMessages sendMessages, IOptions<RabbitMqConnectionSettings> rabbitMqConnectionSettings)
+
+    public ROrderService(OrderDataBaseContext context,ISendMessages sendMessages)
     {
-        _rabbitMqConnectionSettings = rabbitMqConnectionSettings.Value;
         this.context = context;
         this.sendMessages = sendMessages;
-        _queueName = _rabbitMqConnectionSettings.queue;
     }
 
     public OrderDetailDto GetOrderById(Guid Id)
@@ -103,7 +98,7 @@ public class ROrderService : IOrderService
             MessageId = Guid.NewGuid(),
             OrderId = order.Id,
         };
-        sendMessages.SendMessage(paymentMessage,null, _queueName);
+        sendMessages.SendMessage(paymentMessage,null, LinkRabbitMQ.OrderSendToPayment);
         //تغییر وضعیت پرداخت سفارش
         order.RequestPayment();
         context.SaveChanges();

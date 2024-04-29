@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OrderService.Infrastructure.Context;
+using OrderService.Model.Links;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using SayyehBanTools.MessagingBus.RabbitMQ.Connection;
@@ -10,16 +11,13 @@ namespace OrderService.MessagingBus.RecievedMessages;
 public class RecievedPaymentOfOrderService : BackgroundService
 {
     private readonly RabbitMQConnection rabbitMQConnection;
-    private readonly string _queueName;
-    public static string QueueName_PaymentDone = "PaymentDone";
     private readonly OrderDataBaseContext context;
     public RecievedPaymentOfOrderService(RabbitMQConnection rabbitMQConnection, OrderDataBaseContext context)
     {
-        _queueName = QueueName_PaymentDone;
         this.rabbitMQConnection = rabbitMQConnection;
         this.rabbitMQConnection.CreateRabbitMQConnection();
         this.rabbitMQConnection.Channel = rabbitMQConnection.Connection.CreateModel();
-        this.rabbitMQConnection.Channel.QueueDeclare(queue: _queueName, durable: true,
+        this.rabbitMQConnection.Channel.QueueDeclare(queue: LinkRabbitMQ.PaymentDone, durable: true,
             exclusive: false, autoDelete: false, arguments: null);
         this.context = context;
     }
@@ -37,7 +35,7 @@ public class RecievedPaymentOfOrderService : BackgroundService
 
         };
 
-        rabbitMQConnection.Channel.BasicConsume(_queueName, false, consumer);
+        rabbitMQConnection.Channel.BasicConsume(LinkRabbitMQ.PaymentDone, false, consumer);
         return Task.CompletedTask;
 
     }

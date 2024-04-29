@@ -27,6 +27,7 @@ builder.Services.Configure<RabbitMqConnectionSettings>(builder.Configuration
 
 builder.Services.AddHostedService<RecievedOrderCreatedMessage>();
 builder.Services.AddHostedService<RecievedPaymentOfOrderService>();
+builder.Services.AddHostedService<ReceivedUpdateProductNameMessage>();
 builder.Services.AddTransient<IProductService, RProductService>();
 builder.Services.AddTransient<IRegisterOrderService, RRegisterOrderService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
