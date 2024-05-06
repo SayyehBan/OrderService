@@ -7,12 +7,14 @@ using OrderService.Model.Services.RegisterOrderServices;
 using SayyehBanTools.ConfigureService;
 using SayyehBanTools.MessagingBus.RabbitMQ.Model;
 using OrderService.MessagingBus.RecievedMessages;
+using OrderService.Model.Links;
+using RestSharp;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers(); 
+builder.Services.AddControllers();
 builder.Services.AddDbContext<OrderDataBaseContext>(o => o.UseSqlServer
                 (SqlServerConnection.ConnectionString("pyxVN5Nd9YMp5Rw+Qm1CVw==", "G67SszvPH7yl16X1HITRrA==", "/sdZ5/rua1NX9Bq+MGFRUA==", "CZ4QU6A8k/il67ImzI7Rqg==", "e7p88q1ib2k7k9a8", "h54pm8tvzqr78mg4")), ServiceLifetime.Singleton);
 
@@ -30,6 +32,10 @@ builder.Services.AddHostedService<RecievedPaymentOfOrderService>();
 builder.Services.AddHostedService<ReceivedUpdateProductNameMessage>();
 builder.Services.AddTransient<IProductService, RProductService>();
 builder.Services.AddTransient<IRegisterOrderService, RRegisterOrderService>();
+builder.Services.AddTransient<IVerifyProductService>(p =>
+{
+    return new RVerifyProductService(new RestClient(LinkServer.ProductService));
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
