@@ -9,6 +9,7 @@ using SayyehBanTools.MessagingBus.RabbitMQ.Model;
 using OrderService.MessagingBus.RecievedMessages;
 using OrderService.Model.Links;
 using RestSharp;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,12 @@ builder.Services.AddTransient<IVerifyProductService>(p =>
 {
     return new RVerifyProductService(new RestClient(LinkServer.ProductService));
 });
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
+    AddJwtBearer(o =>
+    {
+        o.Authority = LinkServer.IdentityService;
+        o.Audience = "orderservice";
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -50,7 +57,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
