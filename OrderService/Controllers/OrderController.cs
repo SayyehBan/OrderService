@@ -6,7 +6,7 @@ namespace OrderService.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(policy: "GetOrders")]
 public class OrderController : ControllerBase
 {
     private readonly IOrderService orderService;

@@ -43,6 +43,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
         o.Authority = LinkServer.IdentityService;
         o.Audience = "orderservice";
     });
+builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ManagementOrders", policy =>
+               policy.RequireClaim("scope", "orderservice.management"));
+            });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("GetOrders", policy =>
+   policy.RequireClaim("scope", "orderservice.getorders"));
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
