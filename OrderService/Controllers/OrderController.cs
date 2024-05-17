@@ -18,7 +18,12 @@ public class OrderController : ControllerBase
     [HttpGet]
     public IActionResult Get()
     {
-        string UserId = "1";
+
+        string UserId;
+
+        UserId = User.Claims.FirstOrDefault(p => p.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
+
+        Console.WriteLine($"Get Order For UserId: {UserId}");
         var orders = orderService.GetOrdersForUser(UserId);
         return Ok(orders);
     }
